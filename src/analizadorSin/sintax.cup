@@ -1,0 +1,67 @@
+package analizadorSin;
+
+import java_cup.runtime.Symbol;
+
+parser code
+{:
+    private Symbol s;
+
+    public void syntax_error(Symbol s) {
+        this.s = s;
+    }
+
+    public Symbol getS() {
+        return this.s;
+    }
+:};
+
+terminal Numero, Identificador, P_izq, P_der, Op_rel, Op_log, Op_ar,
+    Leer, P_coma, Si, Entero, Hasta, FinPrograma, Programa, Error, Cadena,
+    Mientras, T_dato, Escribir, Entonces, FinSi, Para, FinMientras, Real, Hacer,
+    Igual, Sino, FinPara;
+non terminal S, E, T, EL, EA, INICIO, SENTENCIA, DECLARACION, Id, PEDIR,
+    ESCRIBIR, ES, MIENTRAS, SI, PARA;
+
+start with INICIO;
+
+INICIO ::= Programa SENTENCIA FinPrograma | Programa Identificador SENTENCIA FinPrograma;
+
+SENTENCIA ::=   SENTENCIA DECLARACION |
+                DECLARACION |
+                SENTENCIA PEDIR |
+                PEDIR |
+                SENTENCIA ESCRIBIR |
+                ESCRIBIR |
+                SENTENCIA MIENTRAS |
+                MIENTRAS |
+                SENTENCIA SI |
+                SI |
+                SENTENCIA PARA |
+                PARA;
+
+DECLARACION ::= Entero Id P_coma | Entero Id Igual Numero P_coma |
+                T_dato Id P_coma | T_dato Id Igual Numero P_coma |
+                Identificador Igual Numero P_coma;
+Id ::= Id Identificador | Identificador;
+
+PEDIR ::= Leer Id P_coma;
+
+ESCRIBIR ::= Escribir ES P_coma;
+ES ::= ES Cadena | Cadena | ES Identificador | Identificador;
+
+MIENTRAS ::= Mientras P_izq S P_der Hacer SENTENCIA FinMientras;
+
+SI ::= Si P_izq S P_der Entonces SENTENCIA FinSi | 
+    Si P_izq S P_der Entonces SENTENCIA Sino SENTENCIA FinSi;
+
+PARA ::= Para DECLARACION Hasta DECLARACION SENTENCIA FinPara;
+
+S ::= EL;
+EL ::= EL Op_log EA;
+EL ::= EA;
+EA ::= E Op_rel E;
+EA ::= E;
+E ::= E Op_ar T;
+E ::= T;
+T ::= Numero | Identificador;
+T ::= P_izq S P_der;
